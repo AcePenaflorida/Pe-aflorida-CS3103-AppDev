@@ -1,0 +1,8 @@
+Kindly modify the pubspec.yaml file if the assets would be downloaded in a different directory.
+
+lib:
+1. main
+2. assets(constains images used in the app)
+3. pages
+   - body
+   - appdrawer

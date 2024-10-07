@@ -1,8 +1,5 @@
-# tutorial_flutter
+# Output
 
-I. Variables:
-- String name = "Ace";
-- int age = 20;
-- double money = 0.000;
-- bool isBroke = true;
+![Output](Activities/Activity 2 - CV/output's image- img.jpg)
+
 

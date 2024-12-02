@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tutorial_flutter/pages/education.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
@@ -37,7 +38,10 @@ class AppDrawer extends StatelessWidget {
             ),
             title: const Text('Education'),
             onTap: () {
-              // Action when tapped
+              Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => EducationPage()),
+            );
             },
           ),
           const Divider(),

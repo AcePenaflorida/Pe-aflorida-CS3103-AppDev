@@ -11,9 +11,9 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   String? _selectedImagePath;
-  bool _isFollowed = false; 
+  bool _isStarred = false; 
   int followersCount = 5; 
-  double goalProgress = 0.1; 
+  double goalProgress = 0.03; 
 
   Future<void> _pickImage() async {
     final ImagePicker picker = ImagePicker();
@@ -115,7 +115,7 @@ class _HomePageState extends State<HomePage> {
                           _showContactDialog(context); // Show contact info when clicked
                         },
                         icon: const Icon(Icons.chat),
-                        label: const Text('Chat'),
+                        label: const Text('Contacts'),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color.fromRGBO(45, 120, 255, 0.9),
                           foregroundColor: Colors.white,
@@ -129,19 +129,13 @@ class _HomePageState extends State<HomePage> {
                       ElevatedButton(
                         onPressed: () {
                           setState(() {
-                            // Toggle followed state
-                            _isFollowed = !_isFollowed;
-                            if (_isFollowed) {
-                              followersCount++; // increase followers count by 1
-                            } else {
-                              followersCount--; // decrease followers count by 1
-                            }
+                            _isStarred = !_isStarred;
                           });
                         },
-                        child: Text(_isFollowed ? 'Followed' : 'Follow'),
+                        child: Text(_isStarred ? 'Starred' : 'Star'),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: _isFollowed ? Colors.white : const Color.fromRGBO(45, 120, 255, 1),
-                          foregroundColor: _isFollowed ? Colors.blue : Colors.white,
+                          backgroundColor: _isStarred ? Colors.white : const Color.fromRGBO(45, 120, 255, 1),
+                          foregroundColor: _isStarred ? Colors.blue : Colors.white,
                           elevation: 0,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12.0),
@@ -160,7 +154,7 @@ class _HomePageState extends State<HomePage> {
           ),
           const SizedBox(height: 40.0),
           const Text(
-            'Project Highlights',
+            'Credited Projects',
             style: TextStyle(
               fontSize: 19,
               fontWeight: FontWeight.bold,

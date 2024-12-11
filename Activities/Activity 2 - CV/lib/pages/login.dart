@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:tutorial_flutter/pages/home.dart';
-import 'package:tutorial_flutter/pages/signup.dart';
+import 'package:tutorial_flutter/pages/top_page.dart';
+import 'dart:async';
 
-
+import 'package:tutorial_flutter/pages/signup.dart'; // For animation delay
 
 class LoginPage extends StatefulWidget {
   @override
@@ -15,31 +15,64 @@ class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   bool _obscurePassword = true;
   bool _rememberMe = false;
+  bool _isSigningIn = false;
+  bool _isCreatingAccount = false;
+  bool _isGoogleIconTapped = false;
 
-  void _signIn() {
-    if (_formKey.currentState!.validate()) {
-      String email = _emailController.text.trim();
-      String password = _passwordController.text;
+void _signIn() async {
+  if (_formKey.currentState!.validate()) {
+    setState(() {
+      _isSigningIn = true;
+    });
 
-      // Simulate a sign-in process (replace with actual backend logic)
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Welcome back, $email!")),
-      );
-    }
+    await Future.delayed(Duration(seconds: 1));
+    setState(() {
+      _isSigningIn = false;
+    });
+
+    String email = _emailController.text.trim();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Welcome back, $email!")),
+    );
+
+    // clear the email and password fields after successful sign-in
+    _emailController.clear();
+    _passwordController.clear();
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => Home()),
+    );
   }
+}
 
-  void _createAccount() {
+
+  void _createAccount() async {
+    setState(() {
+      _isCreatingAccount = true;
+    });
+    // Simulate a delay for sign-up process
+    await Future.delayed(Duration(seconds: 1));
+    setState(() {
+      _isCreatingAccount = false;
+    });
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => SignUpPage()),
     );
   }
 
-  void _forgotPassword() {
+  void _animateGoogleIcon() async {
+    setState(() {
+      _isGoogleIconTapped = true;
+    });
+    await Future.delayed(Duration(milliseconds: 300));
+    setState(() {
+      _isGoogleIconTapped = false;
+    });
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Forgot Password? Reset link sent!")),
+      SnackBar(content: Text("Signing in with Google...")),
     );
-    // Add navigation or reset link sending logic here.
   }
 
   @override
@@ -62,11 +95,19 @@ class _LoginPageState extends State<LoginPage> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(height: 8),
-                Text(
-                  "Discover Limitless Choices and Unmatched Convenience.",
-                  style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+                SizedBox(height: 16),
+                Container(
+                height: 150,
+                width: 100,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.asset(
+                    'lib/assets/hi_man_icon.png', 
+                    fit: BoxFit.contain,
+                  ),
                 ),
+              ),
+
                 SizedBox(height: 32),
                 TextFormField(
                   controller: _emailController,
@@ -81,8 +122,6 @@ class _LoginPageState extends State<LoginPage> {
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your email';
-                    } else if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-                      return 'Enter a valid email address';
                     }
                     return null;
                   },
@@ -113,9 +152,7 @@ class _LoginPageState extends State<LoginPage> {
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your password';
-                    } else if (value.length < 6) {
-                      return 'Password must be at least 6 characters long';
-                    }
+                    } 
                     return null;
                   },
                 ),
@@ -137,7 +174,11 @@ class _LoginPageState extends State<LoginPage> {
                       ],
                     ),
                     TextButton(
-                      onPressed: _forgotPassword,
+                      onPressed: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text("Forgot Password? Reset link sent!")),
+                        );
+                      },
                       child: Text(
                         "Forgot Password?",
                         style: TextStyle(color: Colors.red),
@@ -145,14 +186,9 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ],
                 ),
-                SizedBox(height: 24),
+                SizedBox(height: 19),
                 ElevatedButton(
-                  onPressed:(){
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => Home()),
-                    );
-                  },
+                  onPressed: _isSigningIn ? null : _signIn,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue,
                     padding: EdgeInsets.symmetric(vertical: 16),
@@ -160,24 +196,38 @@ class _LoginPageState extends State<LoginPage> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: Text(
-                    "Sign In",
-                    style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
-                  ),
+                  child: _isSigningIn
+                      ? CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        )
+                      : Text(
+                          "Sign In",
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                 ),
                 SizedBox(height: 16),
                 OutlinedButton(
-                  onPressed: _createAccount,
+                  onPressed: _isCreatingAccount ? null : _createAccount,
                   style: OutlinedButton.styleFrom(
                     padding: EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: Text(
-                    "Create Account",
-                    style: TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.bold),
-                  ),
+                  child: _isCreatingAccount
+                      ? CircularProgressIndicator()
+                      : Text(
+                          "Create Account",
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                 ),
                 SizedBox(height: 24),
                 Row(
@@ -187,26 +237,26 @@ class _LoginPageState extends State<LoginPage> {
                   ],
                 ),
                 SizedBox(height: 24),
+                
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // Google Sign In Button
                     GestureDetector(
-                      onTap: () {
-                        // Handle Google Sign-In
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text("Signing in with Google...")),
-                        );
-                      },
-                      child: Container(
+                      onTap: _animateGoogleIcon,
+                      child: AnimatedContainer(
+                        duration: Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                        transform: _isGoogleIconTapped
+                            ? Matrix4.rotationZ(0.1)
+                            : Matrix4.identity(),
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.2), // Shadow color
-                              blurRadius: 6, // Blur radius
-                              spreadRadius: 2, // Spread radius
-                              offset: Offset(0, 2), // Shadow position
+                              color: Colors.black.withOpacity(0.2),
+                              blurRadius: 6,
+                              spreadRadius: 2,
+                              offset: Offset(0, 2),
                             ),
                           ],
                         ),
@@ -214,7 +264,7 @@ class _LoginPageState extends State<LoginPage> {
                           radius: 30,
                           backgroundColor: Colors.white,
                           child: Image.asset(
-                            'lib/assets/google_logo.png', // Ensure the image is in the assets folder
+                            'lib/assets/google_logo.png',
                             height: 30.0,
                           ),
                         ),
@@ -230,187 +280,3 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 }
-
-
-// class _LoginPageState extends State<LoginPage> {
-//   final _emailController = TextEditingController();
-//   final _passwordController = TextEditingController();
-//   final _formKey = GlobalKey<FormState>();
-//   bool _obscurePassword = true;
-
-//   void _signIn() {
-//     if (_formKey.currentState!.validate()) {
-//       String email = _emailController.text.trim();
-//       String password = _passwordController.text;
-
-//       // Simulate a sign-in process (replace with actual backend logic)
-//       ScaffoldMessenger.of(context).showSnackBar(
-//         SnackBar(content: Text("Welcome back, $email!")),
-//       );
-//     }
-//   }
-
-//   void _createAccount() {
-//     Navigator.push(
-//       context,
-//       MaterialPageRoute(builder: (context) => SignUpPage()),
-//     );
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       body: SingleChildScrollView(
-//         child: Padding(
-//           padding: const EdgeInsets.symmetric(horizontal: 24.0),
-//           child: Form(
-//             key: _formKey,
-//             child: Column(
-//               mainAxisAlignment: MainAxisAlignment.center,
-//               crossAxisAlignment: CrossAxisAlignment.stretch,
-//               children: [
-//                 SizedBox(height: 80),
-//                 Text(
-//                   "Welcome back,",
-//                   style: TextStyle(
-//                     fontSize: 28,
-//                     fontWeight: FontWeight.bold,
-//                   ),
-//                 ),
-//                 SizedBox(height: 8),
-//                 Text(
-//                   "Discover Limitless Choices and Unmatched Convenience.",
-//                   style: TextStyle(fontSize: 16, color: Colors.grey[700]),
-//                 ),
-//                 SizedBox(height: 32),
-//                 TextFormField(
-//                   controller: _emailController,
-//                   keyboardType: TextInputType.emailAddress,
-//                   decoration: InputDecoration(
-//                     labelText: "E-Mail",
-//                     border: OutlineInputBorder(
-//                       borderRadius: BorderRadius.circular(12),
-//                     ),
-//                     prefixIcon: Icon(Icons.email),
-//                   ),
-//                   validator: (value) {
-//                     if (value == null || value.isEmpty) {
-//                       return 'Please enter your email';
-//                     } else if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-//                       return 'Enter a valid email address';
-//                     }
-//                     return null;
-//                   },
-//                 ),
-//                 SizedBox(height: 16),
-//                 TextFormField(
-//                   controller: _passwordController,
-//                   obscureText: _obscurePassword,
-//                   decoration: InputDecoration(
-//                     labelText: "Password",
-//                     border: OutlineInputBorder(
-//                       borderRadius: BorderRadius.circular(12),
-//                     ),
-//                     prefixIcon: Icon(Icons.lock),
-//                     suffixIcon: IconButton(
-//                       icon: Icon(
-//                         _obscurePassword
-//                             ? Icons.visibility_off
-//                             : Icons.visibility,
-//                       ),
-//                       onPressed: () {
-//                         setState(() {
-//                           _obscurePassword = !_obscurePassword;
-//                         });
-//                       },
-//                     ),
-//                   ),
-//                   validator: (value) {
-//                     if (value == null || value.isEmpty) {
-//                       return 'Please enter your password';
-//                     } else if (value.length < 6) {
-//                       return 'Password must be at least 6 characters long';
-//                     }
-//                     return null;
-//                   },
-//                 ),
-//                 SizedBox(height: 16),
-//                 ElevatedButton(
-//                   onPressed: _signIn,
-//                   style: ElevatedButton.styleFrom(
-//                     backgroundColor: Colors.blue,
-//                     padding: EdgeInsets.symmetric(vertical: 16),
-//                     shape: RoundedRectangleBorder(
-//                       borderRadius: BorderRadius.circular(12),
-//                     ),
-//                   ),
-//                   child: Text(
-//                     "Sign In",
-//                     style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
-//                   ),
-//                 ),
-//                 SizedBox(height: 16),
-//                 OutlinedButton(
-//                   onPressed: _createAccount,
-//                   style: OutlinedButton.styleFrom(
-//                     padding: EdgeInsets.symmetric(vertical: 16),
-//                     shape: RoundedRectangleBorder(
-//                       borderRadius: BorderRadius.circular(12),
-//                     ),
-//                   ),
-//                   child: Text(
-//                     "Create Account",
-//                     style: TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.bold),
-//                   ),
-//                 ),
-//                 SizedBox(height: 24),
-//                 Row(
-//                   mainAxisAlignment: MainAxisAlignment.center,
-//                   children: [
-//                     Text("Or Sign In With"),
-//                   ],
-//                 ),
-//                 SizedBox(height: 24),
-//                 Row(
-//                   mainAxisAlignment: MainAxisAlignment.center,
-//                   children: [
-//                     // Google Sign In Button
-//                     GestureDetector(
-//                       onTap: () {
-//                         // Handle Google Sign-In
-//                         ScaffoldMessenger.of(context).showSnackBar(
-//                           SnackBar(content: Text("Signing in with Google...")),
-//                         );
-//                       },
-//                       child: Container(
-//                         decoration: BoxDecoration(
-//                           shape: BoxShape.circle,
-//                           boxShadow: [
-//                             BoxShadow(
-//                               color: Colors.black.withOpacity(0.2), // Shadow color
-//                               blurRadius: 6, // Blur radius
-//                               spreadRadius: 2, // Spread radius
-//                               offset: Offset(0, 2), // Shadow position
-//                             ),
-//                           ],
-//                         ),
-//                         child: CircleAvatar(
-//                           radius: 30,
-//                           backgroundColor: Colors.white,
-//                           child: Image.asset(
-//                             'lib/assets/google_logo.png', // Ensure the image is in the assets folder
-//                             height: 30.0,
-//                           ),
-//                         ),
-//                       ),
-//                     ),
-//                   ],
-//                 ),
-//               ],
-//             ),
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }

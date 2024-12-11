@@ -29,6 +29,8 @@ environment:
 # versions available, run `flutter pub outdated`.
 dependencies:
   flutter_login: ^3.2.0
+  url_launcher: ^6.0.10
+  image_picker: ^0.8.7
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.8
@@ -79,12 +81,13 @@ flutter:
   # see https://flutter.dev/to/font-from-package
 
   assets:
-    - lib/assets/future.png
-    - lib/assets/user.png
     - lib/assets/formal_pic.jpg
     - lib/assets/toga.png
-    - lib/assets/project-management2.png
     - lib/assets/google_logo.png
+    - lib/assets/github.png
+    - lib/assets/bsu.jpg
+    - lib/assets/hi_man_icon.png
+
 
 
 

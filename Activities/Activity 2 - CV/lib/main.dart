@@ -31,7 +31,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
   void initState() {
     super.initState();
     // Simulate a loading delay
-    Future.delayed(const Duration(seconds: 3), () {
+    Future.delayed(const Duration(seconds: 3), () { 
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => LoginPage()),
@@ -46,10 +46,8 @@ class _LoadingScreenState extends State<LoadingScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Loading spinner
             CircularProgressIndicator(),
             SizedBox(height: 16),
-            // Loading text
             Text(
               "Loading...",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
